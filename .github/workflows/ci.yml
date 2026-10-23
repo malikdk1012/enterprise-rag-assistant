@@ -1,4 +1,4 @@
-﻿name: Enterprise RAG Assistant CI
+name: Enterprise RAG Assistant CI
 
 on:
   push:
@@ -28,3 +28,7 @@ jobs:
 
       - name: Run tests
         run: python -m pytest -v
+
+      - name: Build Docker image
+        run: docker build -t enterprise-rag-assistant:test .
+
