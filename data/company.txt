@@ -1,0 +1,8 @@
+Company: TechNova
+
+TechNova is a software company founded in 2018.
+The company has its headquarters in Berlin, Germany.
+TechNova develops cloud software and data analytics tools.
+The engineering team uses Python, SQL, and Docker.
+Employees receive 25 days of annual leave.
+The customer support team operates from Monday to Friday.

@@ -1,0 +1,11 @@
+Company Information
+
+Our company provides software development and data engineering services.
+
+Our data engineering team uses Python and SQL to process, clean, and validate data.
+
+The company uses Docker to package applications and GitHub Actions to automate testing and deployment.
+
+Employees can contact the IT support team for technical problems.
+
+The standard working hours are Monday to Friday, from 9 AM to 5 PM.
