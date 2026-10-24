@@ -1,6 +1,5 @@
-
+﻿
 from pathlib import Path
-import re
 
 import faiss
 from sentence_transformers import SentenceTransformer
@@ -8,6 +7,7 @@ from sentence_transformers import SentenceTransformer
 # Locate the project and data folders.
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_DIR / "data"
+MIN_SCORE = 0.30
 
 # Load a small model that creates text embeddings.
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -27,18 +27,31 @@ def load_documents():
     return documents
 
 
-def split_into_chunks(text, chunk_size=100):
-    """Split text into small groups of words."""
+def split_into_chunks(text, chunk_size=100, overlap=20):
+    """Split text into overlapping groups of words."""
+    if chunk_size <= 0:
+        raise ValueError("chunk_size must be greater than zero")
+
+    if overlap < 0 or overlap >= chunk_size:
+        raise ValueError(
+            "overlap must be at least zero and smaller than chunk_size"
+        )
+
     words = text.split()
+    chunks = []
+    step = chunk_size - overlap
 
-    return [
-        " ".join(words[i:i + chunk_size])
-        for i in range(0, len(words), chunk_size)
-    ]
+    for i in range(0, len(words), step):
+        chunk = " ".join(words[i:i + chunk_size])
+        if chunk:
+            chunks.append(chunk)
 
+    return chunks
 
 def search_documents(question):
     """Find relevant text using semantic similarity."""
+    if not question or not question.strip():
+        return []
     documents = load_documents()
     chunks = []
 
@@ -79,7 +92,7 @@ def search_documents(question):
     results = []
 
     for score, idx in zip(scores[0], indices[0]):
-        if idx >= 0:
+        if idx >= 0 and float(score) >= MIN_SCORE:
             results.append({
                 "source": chunks[idx]["source"],
                 "text": chunks[idx]["text"],
@@ -87,3 +100,4 @@ def search_documents(question):
             })
 
     return results
+
