@@ -1,0 +1,223 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise RAG Assistant</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f5f9;
+            color: #202938;
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
+
+        h1 { margin-bottom: 8px; }
+        .subtitle { color: #64748b; margin-bottom: 24px; }
+
+        #chat-history {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px;
+            overflow-wrap: anywhere;
+        }
+
+        .question {
+            font-weight: bold;
+            color: #1d4ed8;
+            margin-bottom: 14px;
+        }
+
+        .answer { line-height: 1.6; white-space: pre-wrap; }
+
+        .sources {
+            border-top: 1px solid #e2e8f0;
+            margin-top: 16px;
+            padding-top: 12px;
+        }
+
+        .source {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .source-title { font-weight: bold; }
+        .score { color: #64748b; font-size: 12px; }
+        .source-text { margin-top: 6px; color: #475569; }
+
+        form {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            position: sticky;
+            bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 90px;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 10px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 18px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:disabled { opacity: 0.6; cursor: wait; }
+        #status { color: #64748b; margin-top: 10px; font-size: 14px; }
+
+        .empty {
+            color: #64748b;
+            text-align: center;
+            padding: 30px 10px;
+        }
+
+        .error { color: #b91c1c; }
+    </style>
+</head>
+<body>
+    <h1>Enterprise RAG Assistant</h1>
+    <p class="subtitle">Ask questions about company documents. Your conversation stays visible while this page remains open.</p>
+
+    <div id="chat-history">
+        <div class="empty" id="welcome">
+            Ask your first question below to get started.
+        </div>
+    </div>
+
+    <form id="question-form">
+        <label for="question"><strong>Your question</strong></label>
+        <textarea id="question" placeholder="For example: Which framework does the engineering team use to build REST APIs?" required></textarea>
+        <button id="ask-button" type="submit">Ask question</button>
+        <div id="status" role="status"></div>
+    </form>
+
+    <script>
+        const form = document.getElementById("question-form");
+        const questionInput = document.getElementById("question");
+        const askButton = document.getElementById("ask-button");
+        const status = document.getElementById("status");
+        const chatHistory = document.getElementById("chat-history");
+        const welcome = document.getElementById("welcome");
+
+        form.addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const question = questionInput.value.trim();
+            if (!question) return;
+
+            askButton.disabled = true;
+            status.textContent = "Searching company documents and generating an answer...";
+
+            try {
+                const response = await fetch(
+                    `/search?question=${encodeURIComponent(question)}`
+                );
+
+                const data = await response.json();
+
+                if (!response.ok || data.error) {
+                    throw new Error(data.debug_error || data.error || "Request failed.");
+                }
+
+                if (welcome) welcome.remove();
+
+                const message = document.createElement("article");
+                message.className = "message";
+
+                const questionHeading = document.createElement("div");
+                questionHeading.className = "question";
+                questionHeading.textContent = "You: " + question;
+                message.appendChild(questionHeading);
+
+                const answerHeading = document.createElement("h3");
+                answerHeading.textContent = "Answer";
+                message.appendChild(answerHeading);
+
+                const answerText = document.createElement("div");
+                answerText.className = "answer";
+                answerText.textContent = data.answer || "No answer was returned.";
+                message.appendChild(answerText);
+
+                const sourcesHeading = document.createElement("h3");
+                sourcesHeading.textContent = "Sources";
+                message.appendChild(sourcesHeading);
+
+                const sourcesContainer = document.createElement("div");
+                sourcesContainer.className = "sources";
+
+                if (data.sources && data.sources.length > 0) {
+                    data.sources.forEach(function(source) {
+                        const sourceCard = document.createElement("div");
+                        sourceCard.className = "source";
+
+                        const title = document.createElement("div");
+                        title.className = "source-title";
+                        title.textContent = source.source || "Company document";
+                        sourceCard.appendChild(title);
+
+                        const score = document.createElement("div");
+                        score.className = "score";
+                        score.textContent = "Relevance score: " +
+                            (typeof source.score === "number"
+                                ? source.score.toFixed(4)
+                                : "Not available");
+                        sourceCard.appendChild(score);
+
+                        const excerpt = document.createElement("div");
+                        excerpt.className = "source-text";
+                        excerpt.textContent = source.text || "";
+                        sourceCard.appendChild(excerpt);
+
+                        sourcesContainer.appendChild(sourceCard);
+                    });
+                } else {
+                    sourcesContainer.textContent = "No sources were returned.";
+                }
+
+                message.appendChild(sourcesContainer);
+                chatHistory.appendChild(message);
+
+                questionInput.value = "";
+                status.textContent = "Answer ready.";
+                message.scrollIntoView({ behavior: "smooth", block: "start" });
+
+            } catch (error) {
+                status.textContent = "Error: " + error.message;
+                status.className = "error";
+            } finally {
+                askButton.disabled = false;
+                questionInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>
