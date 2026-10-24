@@ -1,44 +1,56 @@
 ﻿# Enterprise RAG Assistant
 
-An AI-powered Retrieval-Augmented Generation (RAG) application that retrieves relevant information from company documents and generates context-aware answers using a locally hosted Large Language Model (LLM).
-
-Built to demonstrate practical skills in AI application development, backend APIs, semantic search, containerization, automated testing, and CI/CD.
+A Retrieval-Augmented Generation (RAG) application that answers questions using company documents. It combines semantic search with a locally running Large Language Model (LLM) to provide context-aware answers with source information.
 
 ## Features
 
-- **RAG pipeline:** Combines document retrieval with LLM-generated answers.
-- **Semantic search:** Generates text embeddings using Sentence Transformers.
-- **Vector search:** Uses FAISS to retrieve relevant document chunks.
-- **Local LLM integration:** Uses Ollama with the `qwen2.5:0.5b` model.
-- **REST API:** Provides endpoints using FastAPI.
-- **Source attribution:** Returns retrieved document excerpts with answers.
-- **Docker and Docker Compose:** Packages and runs the application in containers.
-- **Automated testing:** Uses pytest to test application functionality.
-- **CI/CD:** GitHub Actions runs tests and builds the Docker image.
+- **Document-based Question Answering:** Answers questions using company information stored in text files.
+- **Semantic Search:** Uses Sentence Transformers to convert text into embeddings.
+- **Vector Search:** Uses FAISS to retrieve relevant document content.
+- **Local LLM Integration:** Uses Ollama with the Qwen 2.5 model to generate answers.
+- **REST API:** Built with FastAPI.
+- **API Documentation:** Interactive API documentation through Swagger UI.
+- **Docker Support:** Run the application in a Docker container.
+- **Docker Compose:** Simplifies application startup and configuration.
+- **Automated Testing:** Includes tests using pytest.
+- **Continuous Integration:** GitHub Actions runs automated checks.
+
+## Architecture
+
+```mermaid
+flowchart TD
+    A[User Question] --> B[FastAPI REST API]
+    B --> C[Sentence Transformers]
+    C --> D[FAISS Vector Search]
+    D --> E[Relevant Company Documents]
+    E --> F[Ollama - Qwen 2.5]
+    F --> G[Answer and Source Information]
+```
+
+## How It Works
+
+1. Company documents are stored in the `data/` directory.
+2. The application processes document text and creates embeddings.
+3. FAISS searches for content relevant to the user's question.
+4. The retrieved context is passed to the local Ollama language model.
+5. The model generates an answer based on the retrieved context.
+6. FastAPI returns the answer and source information to the user.
 
 ## Technology Stack
 
 | Technology | Purpose |
 |---|---|
-| Python | Application development |
-| FastAPI | REST API |
+| Python | Main programming language |
+| FastAPI | REST API development |
 | Sentence Transformers | Text embeddings |
 | FAISS | Vector similarity search |
-| Ollama | Local LLM inference |
-| Qwen 2.5 (0.5B) | Answer generation |
-| Docker | Containerization |
-| Docker Compose | Application orchestration |
+| Ollama | Local language model execution |
+| Qwen 2.5 | Language model |
 | pytest | Automated testing |
+| Docker | Application containerization |
+| Docker Compose | Container configuration and startup |
+| Git and GitHub | Version control and source code hosting |
 | GitHub Actions | Continuous integration |
-
-## How It Works
-
-1. Load text documents from the `data/` directory.
-2. Split document text into chunks.
-3. Convert chunks into vector embeddings.
-4. Use FAISS to retrieve relevant content for a question.
-5. Send the retrieved context and question to Ollama.
-6. Return the generated answer and source information through the API.
 
 ## Project Structure
 
@@ -46,152 +58,164 @@ Built to demonstrate practical skills in AI application development, backend API
 enterprise-rag-assistant/
 ├── app/
 │   ├── main.py
-│   ├── rag.py
-│   └── test_rag.py
+│   └── rag.py
 ├── data/
-│   ├── company_info.txt
-│   └── company.txt
+│   └── company_info.txt
 ├── tests/
-│   └── test_api.py
 ├── .github/
 │   └── workflows/
 │       └── ci.yml
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
-├── constraints.txt
-├── .dockerignore
+├── README.md
 └── .gitignore
 ```
+
+*Note: The structure above represents the main project files; your repository may contain additional files.*
 
 ## Getting Started
 
 ### Prerequisites
 
+Install or configure the following:
+
+- Python 3.12
+- Docker Desktop
+- Ollama
 - Git
-- Docker Desktop with Docker Compose
-- Ollama installed on the host machine
-- The `qwen2.5:0.5b` model downloaded in Ollama
 
-### Run with Docker Compose
-
-Clone the repository:
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/malikdk1012/enterprise-rag-assistant.git
 cd enterprise-rag-assistant
 ```
 
-Download the model and ensure Ollama is running on your host:
+### 2. Create and Activate a Virtual Environment
 
-```bash
-ollama pull qwen2.5:0.5b
-```
-
-Start the application:
-
-```bash
-docker compose up -d --build
-```
-
-Check the container:
-
-```bash
-docker compose ps
-```
-
-Open the interactive API documentation:
-
-http://localhost:8000/docs
-
-Check the health endpoint:
-
-http://localhost:8000/health
-
-Expected response:
-
-```json
-{"status": "ok"}
-```
-
-**Note:** The Compose configuration connects the container to Ollama through `host.docker.internal`. Ollama must be running and accessible on the host.
-
-Stop the application:
-
-```bash
-docker compose down
-```
-
-### Run Locally
-
-Create and activate a virtual environment on Windows PowerShell:
+On Windows PowerShell:
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-Install dependencies:
+### 3. Install Dependencies
 
-```bash
+```powershell
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Ensure Ollama is running and the model is available:
+### 4. Configure Ollama
+
+Install Ollama and download the model:
 
 ```bash
 ollama pull qwen2.5:0.5b
 ```
 
-Start the API:
+Make sure Ollama is running and accessible to the application.
+
+### 5. Start the Application
+
+For local development, use the command configured for your FastAPI application. If the application object is `app` in `app/main.py`, run:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Open http://localhost:8000/docs.
+Open the API documentation at:
+
+`http://127.0.0.1:8000/docs`
+
+## Running with Docker Compose
+
+Make sure Docker Desktop is running and Ollama is available on your host machine.
+
+Build and start the application:
+
+```powershell
+docker compose up -d --build
+```
+
+View running containers:
+
+```powershell
+docker compose ps
+```
+
+View application logs:
+
+```powershell
+docker compose logs -f app
+```
+
+Stop the application:
+
+```powershell
+docker compose down
+```
+
+The Docker Compose configuration uses `host.docker.internal` to allow the container to reach Ollama running on the host machine.
 
 ## API Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | `/` | Application welcome message |
-| GET | `/health` | Health status |
-| GET | `/search?question=...` | Retrieves relevant context and generates an answer |
+| GET | `/` | Application welcome or status response |
+| GET | `/health` | Health check |
+| GET | `/search?question=your_question` | Retrieve relevant context and generate an answer |
+| GET | `/docs` | Interactive API documentation |
 
-### Example Search Request
+### Example Request
 
-```bash
-curl -G "http://localhost:8000/search" --data-urlencode "question=What programming language does the team use?"
+```powershell
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/search?question=What%20programming%20language%20does%20the%20team%20use%3F"
 ```
 
-The response contains the question, generated answer, and retrieved sources. With the sample company documents, the answer should identify Python as a language used by the team.
+The response contains the generated answer and source information, according to the application's implementation.
 
 ## Testing
 
-Run the automated tests:
+Run automated tests using:
 
-```bash
+```powershell
 python -m pytest -v
 ```
 
 ## Continuous Integration
 
-GitHub Actions runs on pushes to `main` and pull requests targeting `main`. The workflow installs dependencies, runs automated tests, and verifies that the Docker image builds.
+GitHub Actions runs the project's configured automated checks whenever changes are pushed or a pull request is opened. The workflow helps catch issues before changes are merged.
 
 ## Future Improvements
 
-- Support PDF and additional document formats.
-- Improve retrieval evaluation and relevance filtering.
-- Add API authentication and structured logging.
-- Persist vector indexes for larger document collections.
+- Support PDF, DOCX, and other document formats.
+- Add document upload functionality.
+- Improve chunking and retrieval quality.
+- Add conversation history.
+- Implement authentication and access control.
+- Add evaluation metrics for retrieval and answer quality.
 - Deploy the application to a cloud platform.
-- Add performance monitoring and more integration tests.
+
+## Learning Outcomes
+
+This project demonstrates practical experience with:
+
+- Building REST APIs with FastAPI.
+- Implementing semantic search and vector retrieval.
+- Integrating a locally hosted language model.
+- Working with Docker and Docker Compose.
+- Writing automated tests.
+- Using GitHub Actions for continuous integration.
 
 ## Author
 
 **Deepak Kumar Malik**
 
-Computer Science graduate interested in AI applications, backend development, and data engineering.
+GitHub: [malikdk1012](https://github.com/malikdk1012)
 
-GitHub: https://github.com/malikdk1012/enterprise-rag-assistant
+---
+
+*Built as a hands-on project to explore Retrieval-Augmented Generation, semantic search, and local LLM integration.*
