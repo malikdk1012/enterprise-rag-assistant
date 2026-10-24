@@ -2,6 +2,7 @@
 from pathlib import Path
 
 import faiss
+from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 
 # Locate the project and data folders.
@@ -14,15 +15,50 @@ model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 def load_documents():
-    """Read all text files from the data folder."""
+    """Read all TXT and PDF files from the data folder."""
     documents = []
 
+    # Load plain text files.
     for file_path in DATA_DIR.glob("*.txt"):
-        text = file_path.read_text(encoding="utf-8")
-        documents.append({
-            "source": file_path.name,
-            "text": text
-        })
+        try:
+            text = file_path.read_text(encoding="utf-8")
+
+            if text.strip():
+                documents.append({
+                    "source": file_path.name,
+                    "text": text
+                })
+
+        except Exception as error:
+            print(f"Could not read {file_path.name}: {error}")
+
+    # Load PDF files.
+    for file_path in DATA_DIR.glob("*.pdf"):
+        try:
+            reader = PdfReader(str(file_path))
+            pages = []
+
+            for page in reader.pages:
+                page_text = page.extract_text() or ""
+
+                if page_text.strip():
+                    pages.append(page_text)
+
+            text = "\n".join(pages)
+
+            if text.strip():
+                documents.append({
+                    "source": file_path.name,
+                    "text": text
+                })
+            else:
+                print(
+                    f"No extractable text found in {file_path.name}. "
+                    "It may be a scanned PDF."
+                )
+
+        except Exception as error:
+            print(f"Could not read {file_path.name}: {error}")
 
     return documents
 
@@ -43,18 +79,22 @@ def split_into_chunks(text, chunk_size=100, overlap=20):
 
     for i in range(0, len(words), step):
         chunk = " ".join(words[i:i + chunk_size])
+
         if chunk:
             chunks.append(chunk)
 
     return chunks
 
+
 def search_documents(question):
     """Find relevant text using semantic similarity."""
     if not question or not question.strip():
         return []
+
     documents = load_documents()
     chunks = []
 
+    # Split each document into searchable chunks.
     for document in documents:
         for chunk in split_into_chunks(document["text"]):
             chunks.append({
@@ -67,14 +107,14 @@ def search_documents(question):
 
     # Convert document chunks into numerical embeddings.
     texts = [chunk["text"] for chunk in chunks]
+
     embeddings = model.encode(
         texts,
         convert_to_numpy=True,
         normalize_embeddings=True
-    )
+    ).astype("float32")
 
     # Build a FAISS index for similarity search.
-    embeddings = embeddings.astype("float32")
     index = faiss.IndexFlatIP(embeddings.shape[1])
     index.add(embeddings)
 
@@ -100,4 +140,3 @@ def search_documents(question):
             })
 
     return results
-
