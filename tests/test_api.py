@@ -32,6 +32,7 @@ def test_search_rejects_empty_question():
 
 
 def test_search_returns_answer(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "test-key")
     documents = [
         {
             "source": "company.txt",
@@ -48,7 +49,7 @@ def test_search_returns_answer(monkeypatch):
     mock_response = Mock()
     mock_response.raise_for_status.return_value = None
     mock_response.json.return_value = {
-        "response": "The team uses FastAPI."
+        "choices": [{"message": {"content": "The team uses FastAPI."}}]
     }
 
     monkeypatch.setattr(
@@ -105,6 +106,7 @@ def test_search_handles_document_search_error(monkeypatch):
 
 
 def test_search_handles_ai_timeout(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "test-key")
     monkeypatch.setattr(
         "app.main.search_documents",
         lambda question: [
@@ -129,6 +131,7 @@ def test_search_handles_ai_timeout(monkeypatch):
 
 
 def test_search_handles_ai_service_unavailable(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "test-key")
     monkeypatch.setattr(
         "app.main.search_documents",
         lambda question: [

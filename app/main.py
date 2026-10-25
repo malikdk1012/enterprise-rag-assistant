@@ -16,11 +16,8 @@ app = FastAPI(
 PROJECT_DIR = Path(__file__).resolve().parent
 CHAT_PAGE = PROJECT_DIR / "static" / "index.html"
 
-OLLAMA_URL = os.getenv(
-    "OLLAMA_URL",
-    "http://localhost:11434/api/generate",
-)
-MODEL_NAME = os.getenv("MODEL_NAME", "qwen2.5:0.5b")
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+MODEL_NAME = os.getenv("MODEL_NAME", "llama-3.3-70b-versatile")
 
 
 @app.get("/")
@@ -40,7 +37,6 @@ def chat():
             status_code=404,
             detail="Chat webpage not found.",
         )
-
     return FileResponse(CHAT_PAGE)
 
 
@@ -65,7 +61,8 @@ def search(
         )
 
     context = "\n\n".join(
-        result["text"] for result in results
+        result["text"]
+        for result in results
         if result.get("text")
     )
 
@@ -79,28 +76,46 @@ def search(
             "sources": [],
         }
 
-    prompt = f"""Answer the question using only the company context below.
-If the answer is not available in the context, say you could not find it.
-
-Company context:
-{context}
-
-Question: {question}
-
-Answer:"""
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise HTTPException(
+            status_code=503,
+            detail="AI service is not configured.",
+        )
 
     try:
         response = requests.post(
-            OLLAMA_URL,
+            GROQ_API_URL,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
             json={
                 "model": MODEL_NAME,
-                "prompt": prompt,
-                "stream": False,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": (
+                            "Answer using only the supplied company "
+                            "context. If the answer is not available "
+                            "in the context, say you could not find it."
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": (
+                            f"Company context:\n{context}\n\n"
+                            f"Question: {question}"
+                        ),
+                    },
+                ],
+                "temperature": 0.2,
             },
-            timeout=120,
+            timeout=60,
         )
         response.raise_for_status()
-        answer = response.json().get("response")
+        data = response.json()
+        answer = data["choices"][0]["message"]["content"]
 
         if not answer:
             raise HTTPException(
@@ -111,14 +126,14 @@ Answer:"""
     except requests.Timeout:
         raise HTTPException(
             status_code=504,
-            detail="The AI service took too long to respond. Please try again.",
+            detail="The AI service timed out. Please try again.",
         )
     except requests.RequestException:
         raise HTTPException(
             status_code=503,
             detail="The AI service is unavailable. Please try again later.",
         )
-    except ValueError:
+    except (ValueError, KeyError, IndexError, TypeError):
         raise HTTPException(
             status_code=502,
             detail="The AI service returned an invalid response.",
