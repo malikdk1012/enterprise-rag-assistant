@@ -1,4 +1,4 @@
-# Enterprise RAG Assistant
+﻿# Enterprise RAG Assistant
 
 A Retrieval-Augmented Generation (RAG) application that answers questions using company documents. It combines semantic search with a locally running Large Language Model (LLM) to provide context-aware answers with source information.
 
@@ -62,20 +62,20 @@ The screenshot below shows the RAG assistant answering a question and displaying
 
 ```text
 enterprise-rag-assistant/
-├── app/
-│   ├── main.py
-│   └── rag.py
-├── data/
-│   └── company_info.txt
-├── tests/
-├── .github/
-│   └── workflows/
-│       └── ci.yml
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-├── README.md
-└── .gitignore
+â”œâ”€â”€ app/
+â”‚   â”œâ”€â”€ main.py
+â”‚   â””â”€â”€ rag.py
+â”œâ”€â”€ data/
+â”‚   â””â”€â”€ company_info.txt
+â”œâ”€â”€ tests/
+â”œâ”€â”€ .github/
+â”‚   â””â”€â”€ workflows/
+â”‚       â””â”€â”€ ci.yml
+â”œâ”€â”€ Dockerfile
+â”œâ”€â”€ docker-compose.yml
+â”œâ”€â”€ requirements.txt
+â”œâ”€â”€ README.md
+â””â”€â”€ .gitignore
 ```
 
 *Note: The structure above represents the main project files; your repository may contain additional files.*
@@ -183,8 +183,18 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8000/search?question=What%20programming
 
 The response contains the generated answer and source information, according to the application's implementation.
 
-## Testing
+## Evaluation
 
+The RAG assistant was evaluated using 15 questions against the local API.
+
+- **Questions tested:** 15
+- **Keyword-based checks passed:** 15/15 in the recorded run
+- **API errors:** 0
+- **Results file:** `evaluation_results.csv`
+
+The result is a preliminary keyword-matching pass rate, not independently verified answer accuracy. Answers and source documents should also be reviewed manually. Results may vary between runs because the application uses an AI service.
+
+## Testing
 Run automated tests using:
 
 ```powershell

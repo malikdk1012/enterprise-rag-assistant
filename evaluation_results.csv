@@ -1,0 +1,16 @@
+﻿No,Question,Expected,Actual answer,Passed automatic check,Source documents,Source count
+1,What does TechNova do?,Required answer terms: cloud software; data analytics,"TechNova is a software company that develops cloud software and data analytics tools, providing software development and data‑engineering services.",PASS,company.txt; company_info.txt,2
+2,What services does the company provide?,Required answer terms: software development; data engineering,"The company provides **software development** and **data engineering** services, including the creation of cloud software and data analytics tools.",PASS,company_info.txt; company.txt,2
+3,Which programming languages does the engineering team use?,Required answer terms: python; sql,The engineering team uses **Python** and **SQL**.,PASS,company_info.txt; company.txt,2
+4,How does the data engineering team use Python and SQL?,Required answer terms: process; clean; validate,"The data engineering team uses Python and SQL to **process, clean, and validate data**.",PASS,company_info.txt; company.txt,2
+5,Which technology packages applications?,Required answer terms: docker,Docker is the technology used to package applications.,PASS,company_info.txt; company.txt,2
+6,Which tool automates testing and deployment?,Required answer terms: github actions,GitHub Actions automates testing and deployment.,PASS,company_info.txt; company.txt,2
+7,How many annual leave days do employees receive?,Required answer terms: 25 days OR 25 days of annual leave,Employees receive **25 days of annual leave**.,PASS,company_info.txt; company.txt,2
+8,What are the standard working days?,Required answer terms: monday to friday OR monday through friday,The standard working days are Monday through Friday.,PASS,company_info.txt,1
+9,What are the standard working hours?,Required answer terms: 9 am OR 9:00 am; 5 pm OR 5:00 pm,"The standard working hours are Monday to Friday, from 9 AM to 5 PM.",PASS,company_info.txt,1
+10,Who should employees contact for technical problems?,Required answer terms: it support,Employees should contact the IT support team for technical problems.,PASS,company_info.txt; company.txt,2
+11,Does the customer support team operate on weekends?,Required answer terms: monday to friday OR monday through friday OR not on weekends OR does not operate on weekends,"No, the customer support team does not operate on weekends. It operates from Monday to Friday.",PASS,company_info.txt; company.txt,2
+12,Does TechNova use Docker?,Required answer terms: docker,"Yes, TechNova uses Docker.",PASS,company.txt; company_info.txt,2
+13,Does the company use Python and SQL for data work?,Required answer terms: python; sql,"Yes, the company uses Python and SQL for its data work.",PASS,company_info.txt; company.txt,2
+14,What is the company's annual revenue?,Should acknowledge that the information is not provided,I could not find the company's annual revenue in the provided context.,PASS,company.txt; company_info.txt,2
+15,How many employees work at TechNova?,Should acknowledge that the information is not provided,I could not find that information in the provided context.,PASS,company.txt; company_info.txt,2
