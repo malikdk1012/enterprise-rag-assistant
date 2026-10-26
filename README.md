@@ -1,4 +1,4 @@
-﻿# Enterprise RAG Assistant
+# Enterprise RAG Assistant
 
 A Retrieval-Augmented Generation (RAG) application that answers questions using company documents. It combines semantic search with a locally running Large Language Model (LLM) to provide context-aware answers with source information.
 
@@ -26,6 +26,12 @@ flowchart TD
     E --> F[Ollama - Qwen 2.5]
     F --> G[Answer and Source Information]
 ```
+
+## Demo
+
+The screenshot below shows the RAG assistant answering a question and displaying its retrieved sources through the FastAPI interface.
+
+![RAG Assistant Demo](rag-demo.png)
 
 ## How It Works
 
