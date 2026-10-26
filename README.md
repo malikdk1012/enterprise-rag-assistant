@@ -51,7 +51,7 @@ The screenshot below shows the RAG assistant answering a question and displaying
 | Sentence Transformers | Text embeddings |
 | FAISS | Vector similarity search |
 | Ollama | Local language model execution |
-| Qwen 2.5 | Language model |
+| Groq API (`llama-3.3-70b-versatile`) | Hosted language model |
 | pytest | Automated testing |
 | Docker | Application containerization |
 | Docker Compose | Container configuration and startup |
@@ -111,16 +111,18 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Configure Ollama
+### 4. Configure Groq
 
-Install Ollama and download the model:
+Create a `.env` file in the project root, using `.env.example` as a template.
 
-```bash
-ollama pull qwen2.5:0.5b
+Add your Groq API key:
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+MODEL_NAME=llama-3.3-70b-versatile
 ```
 
-Make sure Ollama is running and accessible to the application.
-
+Replace the placeholder with your own API key. Never commit `.env` or share your API key publicly.
 ### 5. Start the Application
 
 For local development, use the command configured for your FastAPI application. If the application object is `app` in `app/main.py`, run:
@@ -135,7 +137,7 @@ Open the API documentation at:
 
 ## Running with Docker Compose
 
-Make sure Docker Desktop is running and Ollama is available on your host machine.
+Make sure Docker Desktop is running and your root `.env` file contains a valid `GROQ_API_KEY`.
 
 Build and start the application:
 
@@ -161,7 +163,7 @@ Stop the application:
 docker compose down
 ```
 
-The Docker Compose configuration uses `host.docker.internal` to allow the container to reach Ollama running on the host machine.
+Docker Compose passes the Groq API key from the root `.env` file to the application container. The application calls the hosted Groq API.
 
 ## API Endpoints
 
@@ -204,21 +206,19 @@ GitHub Actions runs the project's configured automated checks whenever changes a
 
 ## Future Improvements
 
-- Support PDF, DOCX, and other document formats.
 - Add document upload functionality.
 - Improve chunking and retrieval quality.
 - Add conversation history.
 - Implement authentication and access control.
 - Add evaluation metrics for retrieval and answer quality.
 - Deploy the application to a cloud platform.
-
 ## Learning Outcomes
 
 This project demonstrates practical experience with:
 
 - Building REST APIs with FastAPI.
 - Implementing semantic search and vector retrieval.
-- Integrating a locally hosted language model.
+- Integrating a hosted language model through the Groq API.
 - Working with Docker and Docker Compose.
 - Writing automated tests.
 - Using GitHub Actions for continuous integration.
@@ -231,4 +231,4 @@ GitHub: [malikdk1012](https://github.com/malikdk1012)
 
 ---
 
-*Built as a hands-on project to explore Retrieval-Augmented Generation, semantic search, and local LLM integration.*
+*Built as a hands-on project to explore Retrieval-Augmented Generation, semantic search, and hosted LLM integration through Groq.*

@@ -4,6 +4,8 @@
     container_name: enterprise-rag-app
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
-      OLLAMA_URL: "http://host.docker.internal:11434/api/generate"
+      MODEL_NAME: ${MODEL_NAME:-llama-3.3-70b-versatile}
     restart: unless-stopped
