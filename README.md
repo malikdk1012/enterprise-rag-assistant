@@ -1,4 +1,4 @@
-﻿# Enterprise RAG Assistant
+# Enterprise RAG Assistant
 
 A Retrieval-Augmented Generation (RAG) application that answers questions using company documents. It combines semantic search with a locally running Large Language Model (LLM) to provide context-aware answers with source information.
 
@@ -62,24 +62,21 @@ The screenshot below shows the RAG assistant answering a question and displaying
 
 ```text
 enterprise-rag-assistant/
-â”œâ”€â”€ app/
-â”‚   â”œâ”€â”€ main.py
-â”‚   â””â”€â”€ rag.py
-â”œâ”€â”€ data/
-â”‚   â””â”€â”€ company_info.txt
-â”œâ”€â”€ tests/
-â”œâ”€â”€ .github/
-â”‚   â””â”€â”€ workflows/
-â”‚       â””â”€â”€ ci.yml
-â”œâ”€â”€ Dockerfile
-â”œâ”€â”€ docker-compose.yml
-â”œâ”€â”€ requirements.txt
-â”œâ”€â”€ README.md
-â””â”€â”€ .gitignore
++-- app/
+|   +-- main.py
+|   +-- rag.py
++-- data/
+|   +-- company_info.txt
++-- tests/
++-- .github/
+|   +-- workflows/
+|       +-- ci.yml
++-- Dockerfile
++-- docker-compose.yml
++-- requirements.txt
++-- README.md
++-- .gitignore
 ```
-
-*Note: The structure above represents the main project files; your repository may contain additional files.*
-
 ## Getting Started
 
 ### Prerequisites
